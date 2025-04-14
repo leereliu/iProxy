@@ -53,19 +53,8 @@ export class Weinre extends Extension {
                     const container = document.querySelector('iframe')?.contentDocument?.querySelector('.description');
 
                     if (container) {
-                        container.innerHTML = `<style>
-                        ${isDarkMode ? `
-                        .content-header {
-                            background: #3b3b3d !important;
-                        }
-                        div {
-                            color : #f0f0f0 !important;
-                        }
-                        `: ''}
-                        </style>
-                        <div>
-                            通过代理访问带有 iproxy=true 参数的页面开始调试
-                        </div>`;
+                        container.innerHTML = 'Add \`iproxy=true\` to url query for debugging';
+                        (container as HTMLElement).style.display = "block"
                     }
                 }
             }
