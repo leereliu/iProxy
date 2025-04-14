@@ -1,6 +1,6 @@
 {
   "name": "whistle.chii-internal",
-  "version": "1.15.4",
+  "version": "0.6.6",
   "description": "Whistle chii plugin",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/liriliri/whistle.chii#readme",
   "dependencies": {
-    "chii": "1.15.4"
+    "chii": "xcodebuild/chii#patch-1"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
