@@ -3,6 +3,9 @@
   "version": "1.2.2",
   "license": "MIT",
   "main": "./dist/main.js",
+  "engines": {
+    "node": "16"
+  },
   "scripts": {
     "renderer-dev": "webpack-dev-server --config ./webpack/webpack.renderer.dev.config.js",
     "main-dev": "webpack --config ./webpack/webpack.main.config.js && electron ./app",
