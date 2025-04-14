@@ -946,6 +946,7 @@ var Index = React.createClass({
         self.refs.rulesDialog.show(data.rules, data.values);
       }
     });
+    events.on('showHttpsSettingsDialog', self.showHttpsSettingsDialog);
 
     if (isClient) {
       var findEditor = function(keyword, prev) {
@@ -974,6 +975,8 @@ var Index = React.createClass({
     events.on('disablePlugin', function(_, plugin, disabled) {
       self.setPluginState(util.getSimplePluginName(plugin), disabled);
     });
+
+    events.on('showCustomCerts', self.showCustomCertsInfo);
 
     events.on('setComposerData', function(_, data) {
       if (!data || self.state.rulesMode) {
@@ -2690,6 +2693,9 @@ var Index = React.createClass({
       function (data, xhr) {
         if (data && data.ec === 0) {
           self.state.interceptHttpsConnects = checked;
+          dataCenter.isCapture = checked ? 1 : 0;
+          events.trigger('reqTabsChange');
+          events.trigger('resTabsChange');
         } else {
           util.showSystemError(xhr);
         }
@@ -3549,11 +3555,7 @@ var Index = React.createClass({
     );
   },
   reinstallAllPlugins: function () {
-    if (dataCenter.enablePluginMgr) {
-      events.trigger('installPlugins');
-    } else {
-      events.trigger('updateAllPlugins', 'reinstallAllPlugins');
-    }
+    events.trigger('updateAllPlugins', 'reinstallAllPlugins');
   },
   chooseFileType: function (e) {
     var value = e.target.value;
@@ -4081,6 +4083,7 @@ var Index = React.createClass({
     var pendingRules = state.pendingRules;
     var pendingValues = state.pendingValues;
     var accountRules = state.accountRules;
+    var hasAccount = state.hasAccount;
     var mustHideLeftMenu = hideLeftMenu && !state.forceShowLeftMenu;
     var pluginsOnlyMode = pluginsMode && rulesMode;
     var showAccount = state.showAccount;
@@ -4116,6 +4119,7 @@ var Index = React.createClass({
         className={
           'main orient-vertical-box' + (showLeftMenu ? ' w-show-left-menu' : '')
           + (showAccount ? ' w-show-account' : '')
+          + (hasAccount ? ' w-has-account' : '')
           + (isEditor && !rulesOnlyMode ? ' w-show-editor' : '') + (isRules ? ' w-show-rules' : '')
           + (rulesOnlyMode || rulesMode ? ' w-show-rules-mode' : '')
         }
@@ -4461,6 +4465,14 @@ var Index = React.createClass({
             isNetwork={isNetwork}
             hide={isPlugins}
           />
+          <a
+              onClick={this.showFiles}
+              className="w-files-menu"
+              style={showAccount ? null : HIDE_STYLE}
+              draggable="false"
+            >
+              <span className="glyphicon glyphicon-file" />Files
+          </a>
           <div
             onMouseEnter={this.showWeinreOptions}
             onMouseLeave={this.hideWeinreOptions}
@@ -4469,14 +4481,6 @@ var Index = React.createClass({
               (showWeinreOptions ? ' w-menu-wrapper-show' : '')
             }
           >
-            <a
-              onClick={this.showFiles}
-              className="w-files-menu"
-              style={showAccount ? null : HIDE_STYLE}
-              draggable="false"
-            >
-              <span className="glyphicon glyphicon-file" />Files
-            </a>
             <a
               onClick={this.showWeinreOptionsQuick}
               onDoubleClick={this.showAnonymousWeinre}
@@ -4783,7 +4787,7 @@ var Index = React.createClass({
               foldGutter={state.foldGutter}
             />
           ) : undefined}
-          {state.hasAccount ? (
+          {hasAccount ? (
             <Account hide={!isAccount} />
           ) : undefined}
           {state.hasNetwork ? (
@@ -5104,19 +5108,19 @@ var Index = React.createClass({
           <div className="modal-footer">
             <button
               type="button"
+              className="btn btn-default"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
               className="btn btn-primary"
               disabled={pendingRules}
               onMouseDown={this.preventBlur}
               onClick={this.importRemoteRules}
             >
               {pendingRules ? 'Importing rules' : 'Import rules'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-default"
-              data-dismiss="modal"
-            >
-              Close
             </button>
           </div>
         </Dialog>
@@ -5134,19 +5138,19 @@ var Index = React.createClass({
           <div className="modal-footer">
             <button
               type="button"
+              className="btn btn-default"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
               className="btn btn-primary"
               disabled={pendingSessions}
               onMouseDown={this.preventBlur}
               onClick={this.importRemoteSessions}
             >
               {pendingSessions ? 'Importing sessions' : 'Import sessions'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-default"
-              data-dismiss="modal"
-            >
-              Close
             </button>
           </div>
         </Dialog>
@@ -5164,19 +5168,19 @@ var Index = React.createClass({
           <div className="modal-footer">
             <button
               type="button"
+              className="btn btn-default"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
               className="btn btn-primary"
               disabled={pendingValues}
               onMouseDown={this.preventBlur}
               onClick={this.importRemoteValues}
             >
               {pendingValues ? 'Importing values' : 'Import values'}
-            </button>
-            <button
-              type="button"
-              className="btn btn-default"
-              data-dismiss="modal"
-            >
-              Close
             </button>
           </div>
         </Dialog>
