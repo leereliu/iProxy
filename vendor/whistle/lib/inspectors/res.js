@@ -940,8 +940,6 @@ module.exports = function (req, res, next) {
               _resHeaders['__iproxy-rules__'] = strwrap(JSON.stringify(ruleRaw) || 'none');
               _resHeaders['__iproxy-real-url__'] = strwrap(req.realUrl || 'none');
 
-              _resHeaders['__iproxy-help__'] = 'See https://github.com/xcodebuild/iproxy';
-
               if (data.charset && typeof data.charset == 'string') {
                 resType = _resHeaders['content-type'];
                 resType =
@@ -955,6 +953,8 @@ module.exports = function (req, res, next) {
                 _resHeaders['content-type'] = resType + '; charset=' + data.charset;
               } else {
                 delete data.charset;
+              }
+
               if (resRules.resType) {
                 var newType = util.getMatcherValue(resRules.resType).split(';');
                 var type = newType[0];
@@ -1335,7 +1335,7 @@ module.exports = function (req, res, next) {
                 isHtml,
                 req
               );
-            }},
+            },
             req
           );
         });
