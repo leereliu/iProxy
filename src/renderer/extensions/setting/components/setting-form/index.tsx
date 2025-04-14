@@ -162,7 +162,7 @@ class InnerSettingForm extends React.Component {
                 </Form.Item>
                 <Form.Item label={t('Copyright')}>
                     <Typography>
-                        Version {version} Made with love
+                        Version {version}
                     </Typography>
                 </Form.Item>
                 <Form.Item label={t('Actions')}>

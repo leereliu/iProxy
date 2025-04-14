@@ -217,8 +217,7 @@ function createMainWindow() {
             // electron >= 10
             contextIsolation: false,
         },
-        // disable frameless in Windows
-        frame: SYSTEM_IS_MACOS ? false : true,
+        frame: true,
         x: mainWindowState.x,
         y: mainWindowState.y,
         show: false,

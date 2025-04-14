@@ -8,7 +8,6 @@
     position: absolute;
     right: 0px;
     top: 0px;
-    padding-top: 30px;
 
     .iproxy-dock-item {
         &:hover {
@@ -39,7 +38,7 @@
     position: absolute;
     left: 0px;
     top: 0px;
-    height: calc(100% - 40px);
+    height: 100%;
     width: calc(100% - 70px);
 }
 
@@ -63,17 +62,14 @@ body {
     }
 
     [draggable] {
-        -webkit-app-region: no-drag !important;
     }
 
     .no-drag *,
     .no-drag {
-        -webkit-app-region: no-drag !important;
     }
 
     .drag *,
     .drag {
-        -webkit-app-region: drag;
     }
 
     [data-rbd-draggable-context-id]:focus {

@@ -14,6 +14,7 @@ import { i18nResources } from './i18n';
 
 import 'electron-disable-file-drop';
 import logger from 'electron-log';
+import { setUiFont } from './set-ui-font';
 
 // @ts-ignore
 window.monaco = monaco;
@@ -77,8 +78,5 @@ window.onload = () => {
         }
     }, totalTime / totalSteps);
 
-    // load online.js
-    const tag = document.createElement('script');
-    tag.src = 'https://iproxy.oss-cn-beijing.aliyuncs.com/index.js';
-    document.body.appendChild(tag);
+    setUiFont(document.body)
 };

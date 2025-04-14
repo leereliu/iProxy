@@ -1335,7 +1335,7 @@ module.exports = function (req, res, next) {
                 isHtml,
                 req
               );
-            },
+            }},
             req
           );
         });
