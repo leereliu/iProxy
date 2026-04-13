@@ -169,6 +169,19 @@ function getSelectedText(x, y) {
 
 exports.getSelectedText = getSelectedText;
 
+exports.download = function(data, filename) {
+  var a = document.createElement('a');
+  document.body.appendChild(a);
+  a.style = 'display: none';
+  var blob = new Blob([JSON.stringify(data)], {type: 'octet/stream'});
+  var url = window.URL.createObjectURL(blob);
+  a.href = url;
+  a.download = filename || 'data_' + formatDate() + '.txt';
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
+
 var PROPS_MENUS = [
   {
     name: 'Copy'
@@ -1043,7 +1056,7 @@ function getMockData(data) {
     return;
   }
   return {
-    rules: data[0].substring(0, 3000),
+    rules: data[0].substring(0, 16000),
     values: getMockValues(data[1])
   };
 }
@@ -1899,8 +1912,7 @@ exports.getText = function(text) {
 exports.parseImportData = function (data, modal, isValues) {
   var list = [];
   var hasConflict;
-  Object.keys(data).forEach(function (name) {
-    var value = data[name];
+  var handleItem = function(name, value) {
     if (value == null) {
       return;
     }
@@ -1929,7 +1941,22 @@ exports.parseImportData = function (data, modal, isValues) {
       value: value,
       isConflict: isConflict
     });
-  });
+  };
+  if (Array.isArray(data)) {
+    var map = {};
+    data.forEach(function (item) {
+      var name = item && item.name;
+      if (name && typeof name === 'string' && !map[name]) {
+        var value = isGroup(name) ? '' : (item.value == null ? item.content : item.value);
+        map[name] = 1;
+        handleItem(name, value);
+      }
+    });
+  } else {
+    Object.keys(data).forEach(function (name) {
+      name && handleItem(name, data[name]);
+    });
+  }
   list.hasConflict = hasConflict;
   return list;
 };
@@ -2598,9 +2625,11 @@ exports.getRawUrl = function (item) {
   return item.fwdHost && item.url.replace(PROTO_RE, '$1' + item.fwdHost);
 };
 
-exports.isGroup = function(name) {
+function isGroup(name) {
   return name && name[0] === '\r';
-};
+}
+
+exports.isGroup = isGroup;
 
 function filterJson(obj, keyword, filterType) {
   if (obj == null) {

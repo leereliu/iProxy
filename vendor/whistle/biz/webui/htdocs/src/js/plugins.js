@@ -16,6 +16,7 @@ var iframes = require('./iframes');
 
 var CMD_RE = /^([\w]{1,12})(\s+-g)?$/;
 var WHISTLE_PLUGIN_RE = /(?:^|[\s,;|])(?:@[\w-]+\/)?whistle\.[a-z\d_-]+(?:\@[\w.^~*-]*)?(?:$|[\s,;|])/;
+var SPACE_RE = /\s+$/;
 var pendingEnable;
 var registryCache;
 
@@ -138,17 +139,13 @@ var Home = React.createClass({
       self.onShowRules(util.getSimplePluginName(plugin));
     });
     events.on('installPlugins', self.showInstall);
-    events.on('updateAllPlugins', function (_, byInstall) {
-      byInstall = byInstall === 'reinstallAllPlugins';
-      if (byInstall && (dataCenter.enableAllPlugins || (self.installUrls && self.installUrls.length))) {
-        return self.showInstall();
-      }
+    events.on('updateAllPlugins', function () {
       var data = self.props.data || {};
       var plugins = data.plugins || {};
       var newPlugins = {};
       var registry;
       getPluginList(plugins).forEach(function (plugin) {
-        if (!plugin || plugin.isProj || (!byInstall && !util.compareVersion(plugin.latest, plugin.version))) {
+        if (!plugin || plugin.isProj || !util.compareVersion(plugin.latest, plugin.version)) {
           return;
         }
         registry = registry || plugin.registry;
@@ -406,6 +403,8 @@ var Home = React.createClass({
       state.registryChanged = false;
       var regCmd = registry ? ' --registry=' + registry + '  ' : '';
       if (cmdMsg) {
+        var r = SPACE_RE.exec(cmdMsg);
+        var spaces = r && r[0];
         cmdMsg = cmdMsg.split('\n').map(function(line) {
           line = line.trim();
           line = line.split(/\s+/).filter(function(cmd) {
@@ -416,10 +415,12 @@ var Home = React.createClass({
           }
           return line;
         }).filter(util.noop).join('\n');
+        if (spaces && !registry) {
+          cmdMsg += spaces;
+        }
       } else {
-        cmdMsg = getCmd() + getArgvs(dataCenter.account, dataCenter.whistleName) + ' ' + (regCmd ?  regCmd : '');
+        cmdMsg = getCmd() + getArgvs(dataCenter.account, dataCenter.whistleName) + ' ' + (regCmd ? regCmd : '');
       }
-
       state.cmdMsg = cmdMsg;
       state.installMsg = cmdMsg;
     }
@@ -666,7 +667,7 @@ var Home = React.createClass({
         </Dialog>
         <Dialog ref="operatePluginDialog" wstyle="w-plugin-update-dialog">
           <div className="modal-body">
-            {hasInstaller ? null : (<h5>
+            {hasInstaller || install ? null : (<h5>
               <a
                 data-dismiss="modal"
                 className="w-copy-text-with-tips"
@@ -677,7 +678,8 @@ var Home = React.createClass({
               and execute it in the CLI:
             </h5>)}
             {
-              install ? <h5>Input the package name of plugins (separated by spaces) and click Install:</h5> : null
+              install ? (hasInstaller ? <h5>Input the package name of plugins (separated by spaces) and click Install:</h5> :
+              <h5>Input the package name of plugins (separated by spaces) and execute it in the CLI:</h5> ) : null
             }
             <textarea
               ref="textarea"
@@ -715,7 +717,7 @@ var Home = React.createClass({
                 {
                   registryList.map(function(url) {
                     return (
-                      <option value={url}>{url}</option>
+                      <option key={url} value={url}>{url}</option>
                     );
                   })
                 }
@@ -940,7 +942,7 @@ var Tabs = React.createClass({
           {tabs.map(function (tab) {
             var disd = util.pluginIsDisabled(props, tab.name);
             return (
-              <li className={activeName == tab.name ? ' active' : ''}>
+              <li key={tab.name} className={activeName == tab.name ? ' active' : ''}>
                 <a
                   data-name={tab.name}
                   title={tab.name}
@@ -975,7 +977,7 @@ var Tabs = React.createClass({
             />
             {tabs.map(function (tab) {
               return (
-                <LazyInit inited={activeName == tab.name}>
+                <LazyInit key={tab.name} inited={activeName == tab.name}>
                   <iframe
                     style={{ display: activeName == tab.name ? '' : 'none' }}
                     src={tab.url}

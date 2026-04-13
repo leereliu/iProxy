@@ -62,7 +62,7 @@ var NON_STAR_RE = /[^*]/;
 var DOMAIN_STAR_RE = /([*~]+)(\\.)?/g;
 var STAR_RE = /\*+/g;
 var PORT_PATTERN_RE = /^!?:\d{1,5}$/;
-var COMMENT_RE = /#[^\r\n]*$/g;
+var COMMENT_RE = /#[^\r\n]*/g;
 var TPL_RE = /^((?:[\w.-]+:)?\/\/)?(`.*`)$/;
 // url:  protocol, host, port, hostname, search, query, pathname, path, href, query.key
 // req|res: ip, method, statusCode, headers?.key, cookies?.key
@@ -922,7 +922,7 @@ function resolveRuleList(req, list, vals, index, isFilter, isEnableProxy, host) 
   };
 
   for (var i = 0; (rule = list[i]); i++) {
-    if ((isEnableProxy && !ENABLE_PROXY_RE.test(rule.matcher)) ||
+    if ((isEnableProxy && !ENABLE_PROXY_RE.test(rule.matcher)) || (req._isInternalReq && !rule.lineProps.internal) ||
       (req._skipProps && (util.exactIgnore(req._skipProps, rule) || util.checkSkip(req._skipProps, rule, curUrl)))) {
       continue;
     }

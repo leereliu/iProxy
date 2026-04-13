@@ -167,11 +167,16 @@ exports.SpeedTransform = require('./speed-transform');
 exports.FileWriterTransform = require('./file-writer-transform');
 exports.getServer = require('hagent').getServer;
 exports.parseUrl = parseUrl;
-exports.request = httpMgr.request;
 exports.parseQuery = parseQuery;
 exports.localIpCache = localIpCache;
 exports.listenerCount = require('./patch').listenerCount;
 exports.EMPTY_BUFFER = EMPTY_BUFFER;
+
+function request(options, callback) {
+  return httpMgr.request(common.setInternalOptions(options, config), callback);
+}
+
+exports.request = request;
 
 function setSecureOptions(options) {
   var secureOptions = cryptoConsts.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION;
@@ -261,13 +266,13 @@ var MAX_LEN = 1024 * 1024 * 5;
 function getLatestVersion(registry, cb) {
   // if (registry && typeof registry !== 'string') {
   //   var name = registry.moduleName;
-  //   registry = registry || 'https://registry.npmjs.org';
+  //   registry = registry.registry || 'https://registry.npmjs.org';
   //   registry = registry.replace(/\/$/, '') + '/' + name;
   // }
   // if (!registry) {
   //   return cb();
   // }
-  // httpMgr.request(
+  // request(
   //   {
   //     url: registry,
   //     maxLength: MAX_LEN
@@ -664,8 +669,8 @@ exports.toRegExp = function toRegExp(regExp, ignoreCase) {
   return regExp;
 };
 
-const isString = common.isString;
-const getFullUrl = common.getFullUrl;
+var isString = common.isString;
+var getFullUrl = common.getFullUrl;
 exports.isString = isString;
 exports.getFullUrl = getFullUrl;
 
@@ -3553,6 +3558,10 @@ exports.connect = function (options, callback) {
 exports.checkPluginReqOnce = function (req, raw) {
   var isPluginReq = req.headers[config.PROXY_ID_HEADER];
   if (raw ? isPluginReq : isPluginReq == 1) {
+    delete req.headers[config.PROXY_ID_HEADER];
+  }
+  if (isPluginReq == 'internal') {
+    req._isInternalReq = true;
     delete req.headers[config.PROXY_ID_HEADER];
   }
   return isPluginReq;
