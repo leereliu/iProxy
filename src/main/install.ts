@@ -23,8 +23,6 @@ import {
     PROXY_CONF_HELPER_FILE_PATH,
 } from './const';
 import { clipboard, dialog } from 'electron';
-import treeKill from 'tree-kill';
-
 import logger from 'electron-log';
 
 import * as shell from 'shelljs';
@@ -116,7 +114,7 @@ Application will quit
 应用程序即将退出
     `,
     );
-    treeKill(process.pid);
+    process.exit(1);
 }
 
 export async function installCertAndHelper() {
@@ -141,8 +139,7 @@ export async function installCertAndHelper() {
         if (SYSTEM_IS_MACOS) {
             // macOS big sur do not allow trust cert in any auto way
             // show box to guide user run command
-            const showGuide = () => {
-                const cmd = `echo "Please input local login password 请输入本地登录密码" && sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${path.join(
+            const cmd = `echo "Please input local login password 请输入本地登录密码" && sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${path.join(
                     dir,
                     CERT_FILE_NAME,
                 )}" && sudo cp ${formatPath(PROXY_CONF_HELPER_FILE_PATH)} ${formatPath(
@@ -151,19 +148,44 @@ export async function installCertAndHelper() {
                     PROXY_CONF_HELPER_PATH,
                 )} && touch ${INSTALL_DONE_FILE} && echo "安装完成"
                 `;
-                clipboard.writeText(cmd);
+            clipboard.writeText(cmd);
 
-                dialog.showMessageBoxSync({
+            const MAX_RETRIES = 10;
+            let retries = 0;
+            let installed = false;
+
+            while (!installed && retries < MAX_RETRIES) {
+                const result = dialog.showMessageBoxSync({
                     type: 'info',
-                    message: `Paste command to your Terminal and run to install cert and helper
-                    （命令已复制到剪贴板）粘贴命令到终端并运行以安装并信任证书
-                    `,
+                    buttons: ['I have run the command / 我已执行命令', 'Cancel / 取消'],
+                    defaultId: 0,
+                    cancelId: 1,
+                    message: `Paste command to your Terminal and run to install cert and helper\n（命令已复制到剪贴板）粘贴命令到终端并运行以安装并信任证书`,
                 });
-            };
-            showGuide();
-            while (!fs.existsSync(INSTALL_DONE_FILE)) {
-                showGuide();
+
+                if (result === 1) {
+                    // user cancelled
+                    reject(new Error('User cancelled installation'));
+                    return;
+                }
+
+                if (fs.existsSync(INSTALL_DONE_FILE)) {
+                    installed = true;
+                } else {
+                    clipboard.writeText(cmd);
+                    dialog.showMessageBoxSync({
+                        type: 'warning',
+                        message: `Installation not detected. Please run the command in Terminal and click OK when done.\n未检测到安装完成，请在终端执行命令后再点击确认。\n\n命令已重新复制到剪贴板。`,
+                    });
+                }
+                retries++;
             }
+
+            if (!installed) {
+                reject(new Error('Installation not completed after retries'));
+                return;
+            }
+
             resolve(true);
         } else if (SYSTEM_IS_LINUX) {
             // only tested in deepin
