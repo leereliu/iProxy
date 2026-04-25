@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  macos-dmg:
+    name: Build macOS dmg
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn --ignore-engines
+
+      - name: Build bundled runtime
+        run: npm run update:node_modules
+
+      - name: Build macOS dmg
+        run: npm run dist:mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: Upload dmg artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: iProxy-macOS-dmg
+          path: release/*.dmg
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: main-${{ github.run_number }}
+          name: iProxy macOS build ${{ github.run_number }}
+          files: release/*.dmg
+          fail_on_unmatched_files: true

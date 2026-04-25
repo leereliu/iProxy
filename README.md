@@ -1,7 +1,8 @@
-[![CI](https://github.com/xcodebuild/iProxy/actions/workflows/ci.yml/badge.svg)](https://github.com/xcodebuild/iProxy/actions/workflows/ci.yml)
-![GitHub issues](https://img.shields.io/github/issues/xcodebuild/iproxy)
-![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/xcodebuild/iproxy)
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fxcodebuild%2Fiproxy&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+[![CI](https://github.com/leereliu/iProxy/actions/workflows/ci.yml/badge.svg)](https://github.com/leereliu/iProxy/actions/workflows/ci.yml)
+[![Release](https://github.com/leereliu/iProxy/actions/workflows/release.yml/badge.svg)](https://github.com/leereliu/iProxy/actions/workflows/release.yml)
+![GitHub issues](https://img.shields.io/github/issues/leereliu/iproxy)
+![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/leereliu/iproxy)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fleereliu%2Fiproxy&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 <p align="center">
    <a href="https://www.yuque.com/iproxy">
@@ -10,7 +11,7 @@
 </p>
 
 <p align="center">
-<b><a href="https://www.yuque.com/iproxy">Download</a></b>
+<b><a href="https://github.com/leereliu/iProxy/releases">Download</a></b>
 |
 <b><a href="https://www.yuque.com/iproxy">Document</a></b>
 
@@ -42,7 +43,9 @@
 
 ## Download
 
-[macOS/Windows/Linux](https://nightly.link/xcodebuild/iProxy/workflows/nightly/master)
+[macOS dmg releases](https://github.com/leereliu/iProxy/releases)
+
+Every push to the `main` branch builds a macOS dmg package and publishes it to GitHub Releases.
 
 ## About Linux Version
 
@@ -64,19 +67,30 @@ Take a quick start at: https://yuque.com/iproxy
 
 ### env
 
-- nodejs > 12 (**important**)
+- Node.js 16
+- Yarn 1.x
 - `npm install -g electron-builder` if you need bundle application
 
 ### dev
 
 ```shell
-git clone https://github.com/xcodebuild/iproxy
-cd iproxy
+git clone https://github.com/leereliu/iProxy
+cd iProxy
 yarn run install-deps
 yarn run dev
 ```
 
-For new contributors you can try to fix a [🏅send-a-PR](https://github.com/xcodebuild/iproxy/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%8F%85send+a+PR%22)
+### build macOS dmg locally
+
+```shell
+NODE_TLS_REJECT_UNAUTHORIZED=0 npm_config_strict_ssl=false YARN_STRICT_SSL=false yarn --ignore-engines
+NODE_TLS_REJECT_UNAUTHORIZED=0 npm_config_strict_ssl=false YARN_STRICT_SSL=false npm run update:node_modules
+NODE_TLS_REJECT_UNAUTHORIZED=0 npm_config_strict_ssl=false YARN_STRICT_SSL=false NODE_OPTIONS=--openssl-legacy-provider npm run dist:mac
+```
+
+The SSL variables above are only needed on local networks that intercept TLS traffic, such as Zscaler. GitHub Actions builds keep normal certificate verification enabled.
+
+For new contributors you can try to fix a [🏅send-a-PR](https://github.com/leereliu/iproxy/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%8F%85send+a+PR%22)
 
 ## 入群讨论
 
@@ -86,11 +100,11 @@ For new contributors you can try to fix a [🏅send-a-PR](https://github.com/xco
 
 ## Contributors ✨
 <p align="center">
-  <a href="https://github.com/xcodebuild/iproxy/graphs/contributors">
-    <img src="https://contributors-img.web.app/image?repo=xcodebuild/iproxy"></img>
+  <a href="https://github.com/leereliu/iproxy/graphs/contributors">
+    <img src="https://contributors-img.web.app/image?repo=leereliu/iproxy"></img>
   </a>
 </p>
 
 ## Commit History
 
-[![Commit History Chart](https://commit-history-api.herokuapp.com/svg?repos=xcodebuild/iProxy&type=Date)](https://the-commit-history.vercel.app/#xcodebuild/iProxy&Date)
+[![Commit History Chart](https://commit-history-api.herokuapp.com/svg?repos=leereliu/iProxy&type=Date)](https://the-commit-history.vercel.app/#leereliu/iProxy&Date)
