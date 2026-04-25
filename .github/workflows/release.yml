@@ -31,7 +31,7 @@ jobs:
         run: npm run update:node_modules
 
       - name: Build macOS dmg
-        run: npm run dist:mac
+        run: npm run dist:mac -- --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
