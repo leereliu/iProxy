@@ -1216,11 +1216,20 @@ var ReqData = React.createClass({
     if (!e.metaKey && !e.ctrlKey) {
       return;
     }
+    var tagName = e.target && e.target.tagName;
+    if (tagName === 'INPUT' || tagName === 'TEXTAREA' || e.target.isContentEditable) {
+      return;
+    }
     if (e.keyCode === 82) {
       events.trigger('replaySessions', [null, e.shiftKey]);
     } else if (e.keyCode === 65) {
       e.preventDefault();
-      events.trigger('abortRequest');
+      var selectedItem = this.props.modal.selectAllVisible();
+      if (selectedItem) {
+        this.updateList();
+        events.trigger('networkStateChange');
+        events.trigger('selectedSessionChange', selectedItem);
+      }
     } else if (e.keyCode === 69) {
       e.preventDefault();
       events.trigger('composer');

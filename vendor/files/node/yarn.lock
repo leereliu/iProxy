@@ -1860,10 +1860,10 @@ set-function-length@^1.2.1:
     gopd "^1.0.1"
     has-property-descriptors "^1.0.2"
 
-set-global-proxy@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/set-global-proxy/-/set-global-proxy-0.2.2.tgz#f2b1e58ae1aab5419626fd0ab00a7eae2da403be"
-  integrity sha512-ds4LqjO3M+GNSwvESyEZ5r8GPtTHkpzgPzUB09K6VQrK+KWaQF2xhEwPDzZF96Oxx7OxtiSPiTPe0Kd9RdkqQA==
+set-global-proxy@^0.2.3:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/set-global-proxy/-/set-global-proxy-0.2.4.tgz#95461a719a4e3a20736ba52a3c58fd15a31912df"
+  integrity sha512-U5tdcfDygrkv/40vgqm9oeFqOgAh+OQdgHx2nNLn33AwjDXycmlsjXvUwRNjCCIshXJ7Zai4KJscDwrQgUjX/w==
 
 setprototypeof@1.1.0:
   version "1.1.0"
@@ -2162,7 +2162,7 @@ whistle-start@../../whistle-start:
     ws "^7.2.1"
 
 whistle.chii-internal@../../whistle.chii-internal:
-  version "0.6.6"
+  version "1.15.4-1.11.1-ui"
   dependencies:
     chii "1.15.4"
 
@@ -2222,7 +2222,7 @@ whistle.vase@^2.2.3:
     velocityjs "^2.0.3"
 
 whistle@../../whistle:
-  version "2.9.95"
+  version "2.9.97"
   dependencies:
     adm-zip "0.5.10"
     async-limiter "2.0.0"
@@ -2244,7 +2244,7 @@ whistle@../../whistle:
     pfork "^0.6.2"
     pipestream "^0.7.4"
     safe-buffer "^5.1.2"
-    set-global-proxy "^0.2.2"
+    set-global-proxy "^0.2.3"
     sni "1.0.0"
     sockx "^0.2.2"
     starting "^8.0.3"

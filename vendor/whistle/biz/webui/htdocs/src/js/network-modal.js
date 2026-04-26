@@ -691,6 +691,24 @@ proto.getSelectedList = function () {
   });
 };
 
+proto.selectAllVisible = function () {
+  var selectedItem;
+  this.list.forEach(function (item) {
+    if (item.hide) {
+      item.selected = false;
+      item.active = false;
+      return;
+    }
+    item.selected = true;
+    item.active = false;
+    selectedItem = selectedItem || item;
+  });
+  if (selectedItem) {
+    selectedItem.active = true;
+  }
+  return selectedItem;
+};
+
 function getPrevSelected(start, list) {
   for (; start >= 0; start--) {
     var item = list[start - 1];
