@@ -611,6 +611,13 @@ var ReqData = React.createClass({
     events.on('selectAllNetworkSessions', function () {
       self.selectAllVisible();
     });
+    self.onIProxyMessage = function (e) {
+      var data = e && e.data;
+      if (data && data.type === 'iproxy-select-all-network-sessions') {
+        self.selectAllVisible();
+      }
+    };
+    window.addEventListener('message', self.onIProxyMessage);
     var curRemoteUrl;
     var importRemoteUrl = function () {
       var hash = location.hash.substring(1);
@@ -658,6 +665,9 @@ var ReqData = React.createClass({
         hideBackBtn();
       }
     });
+  },
+  componentWillUnmount: function () {
+    window.removeEventListener('message', this.onIProxyMessage);
   },
   onDragStart: function (e) {
     var target = $(e.target).closest('.w-req-data-item');

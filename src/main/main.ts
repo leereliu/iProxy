@@ -61,6 +61,17 @@ const version = APP_VERSION;
 
 let appReady = false;
 
+const SELECT_ALL_NETWORK_SESSIONS_SCRIPT = `
+(() => {
+    const iframe = document.querySelector('iframe.iproxy-network-iframe');
+    if (!iframe || window.getComputedStyle(iframe).display === 'none') {
+        return false;
+    }
+    iframe.contentWindow.postMessage({ type: 'iproxy-select-all-network-sessions' }, '*');
+    return true;
+})()
+`;
+
 app.commandLine.appendSwitch('--no-proxy-server');
 app.commandLine.appendSwitch('disable-site-isolation-trials');
 
@@ -293,6 +304,13 @@ function createMainWindow() {
         setImmediate(() => {
             window.focus();
         });
+    });
+
+    window.webContents.on('before-input-event', (_event, input) => {
+        const key = input.key && input.key.toLowerCase();
+        if ((input.meta || input.control) && !input.alt && !input.shift && key === 'a') {
+            window.webContents.executeJavaScript(SELECT_ALL_NETWORK_SESSIONS_SCRIPT, true).catch(() => undefined);
+        }
     });
 
     const REFRESH_KEYS = ['CommandOrControl+R', 'CommandOrControl+Shift+R', 'F5'];

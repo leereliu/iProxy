@@ -1,6 +1,6 @@
 {
   "name": "iProxy",
-  "version": "1.2.4-way",
+  "version": "1.2.5-way",
   "license": "MIT",
   "main": "./dist/main.js",
   "engines": {
