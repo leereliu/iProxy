@@ -1,5 +1,6 @@
 # 2026-04-26
 
+- 修复 Network 面板重复执行 Command+A 后虚拟列表部分可见行未同步选中样式的问题 @leereliu
 - 修复 Electron 默认 Select All 菜单 accelerator 抢占 Command+A，导致 Network 全选请求无法触发的问题，并补充主进程快捷键保障 @leereliu
 - 修复 macOS 下 Command+A 被 Electron 菜单消费导致 Network 面板无法全选请求的问题 @leereliu
 - 修复 Network 面板 Command+A 在列表未获得焦点时无法选择当前可见请求的问题 @leereliu

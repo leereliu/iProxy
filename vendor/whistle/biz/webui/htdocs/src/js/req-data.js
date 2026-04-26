@@ -1195,6 +1195,16 @@ var ReqData = React.createClass({
   updateList: function () {
     this.refs.content.refs.list.forceUpdateGrid();
   },
+  syncVisibleSelection: function () {
+    var modal = this.props.modal;
+    if (!this.$content || !modal) {
+      return;
+    }
+    this.$content.find('tr[data-id]').each(function () {
+      var item = modal.getItem(this.getAttribute('data-id'));
+      $(this).toggleClass('w-selected', !!(item && !item.hide && item.selected));
+    });
+  },
   onFilterChange: function (keyword) {
     var self = this;
     var filterBody = BODY_FILTER.test(keyword);
@@ -1277,9 +1287,14 @@ var ReqData = React.createClass({
     }
   },
   selectAllVisible: function () {
+    var self = this;
     var selectedItem = this.props.modal.selectAllVisible();
     if (selectedItem) {
       this.updateList();
+      this.syncVisibleSelection();
+      setTimeout(function () {
+        self.syncVisibleSelection();
+      }, 0);
       events.trigger('networkStateChange');
       events.trigger('selectedSessionChange', selectedItem);
     }
