@@ -1,7 +1,10 @@
 {
   "name": "iProxy",
-  "version": "1.2.7-way",
+  "version": "1.2.8-leereliu",
   "license": "MIT",
+  "contributors": [
+    "leereliu"
+  ],
   "main": "./dist/main.js",
   "engines": {
     "node": "16"
