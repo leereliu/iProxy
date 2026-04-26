@@ -200,6 +200,18 @@ function isTypingTarget(target) {
   return !!target && (tagName === 'INPUT' || tagName === 'TEXTAREA' || target.isContentEditable);
 }
 
+function selectTypingTarget(target) {
+  if (!isTypingTarget(target)) {
+    return false;
+  }
+  if (target.select) {
+    target.select();
+  } else if (document.execCommand) {
+    document.execCommand('selectAll');
+  }
+  return true;
+}
+
 function hasRules(rules) {
   var keys = Object.keys(rules);
   if (keys && keys.length) {
@@ -611,10 +623,22 @@ var ReqData = React.createClass({
     events.on('selectAllNetworkSessions', function () {
       self.selectAllVisible();
     });
+    self.onSelectAllShortcut = function (e) {
+      if ((e.metaKey || e.ctrlKey) && e.keyCode === 65 && !isTypingTarget(e.target)) {
+        e.preventDefault();
+        self.selectAllVisible();
+      }
+    };
+    document.addEventListener('keydown', self.onSelectAllShortcut, true);
+    window.__iproxySelectAllNetworkSessions = function () {
+      self.selectAllVisible();
+    };
     self.onIProxyMessage = function (e) {
       var data = e && e.data;
       if (data && data.type === 'iproxy-select-all-network-sessions') {
-        self.selectAllVisible();
+        if (!selectTypingTarget(document.activeElement)) {
+          self.selectAllVisible();
+        }
       }
     };
     window.addEventListener('message', self.onIProxyMessage);
@@ -667,7 +691,11 @@ var ReqData = React.createClass({
     });
   },
   componentWillUnmount: function () {
+    document.removeEventListener('keydown', this.onSelectAllShortcut, true);
     window.removeEventListener('message', this.onIProxyMessage);
+    if (window.__iproxySelectAllNetworkSessions) {
+      window.__iproxySelectAllNetworkSessions = null;
+    }
   },
   onDragStart: function (e) {
     var target = $(e.target).closest('.w-req-data-item');

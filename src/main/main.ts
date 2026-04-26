@@ -63,14 +63,100 @@ let appReady = false;
 
 const SELECT_ALL_NETWORK_SESSIONS_SCRIPT = `
 (() => {
-    const iframe = document.querySelector('iframe.iproxy-network-iframe');
-    if (!iframe || window.getComputedStyle(iframe).display === 'none') {
-        return false;
-    }
-    iframe.contentWindow.postMessage({ type: 'iproxy-select-all-network-sessions' }, '*');
-    return true;
+    const iframes = Array.prototype.slice.call(document.querySelectorAll('iframe.iproxy-network-iframe'));
+    let handled = false;
+    iframes.forEach((iframe) => {
+        if (!iframe || window.getComputedStyle(iframe).display === 'none') {
+            return;
+        }
+        handled = true;
+        try {
+            if (iframe.contentWindow && typeof iframe.contentWindow.__iproxySelectAllNetworkSessions === 'function') {
+                iframe.contentWindow.__iproxySelectAllNetworkSessions();
+                return;
+            }
+        } catch (e) {}
+        try {
+            iframe.contentWindow && iframe.contentWindow.postMessage({ type: 'iproxy-select-all-network-sessions' }, '*');
+        } catch (e) {}
+    });
+    return handled;
 })()
 `;
+
+const SELECT_ALL_NETWORK_SESSIONS_FRAME_SCRIPT = `
+(() => {
+    const activeElement = document.activeElement;
+    const tagName = activeElement && activeElement.tagName;
+    if (
+        activeElement &&
+        (activeElement.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/i.test(tagName || ''))
+    ) {
+        return 'typing';
+    }
+    if (typeof window.__iproxySelectAllNetworkSessions === 'function') {
+        window.__iproxySelectAllNetworkSessions();
+        return 'selected';
+    }
+    window.postMessage({ type: 'iproxy-select-all-network-sessions' }, '*');
+    return 'missing';
+})()
+`;
+
+function getAllFrames(frame: any): any[] {
+    if (!frame) {
+        return [];
+    }
+    const childFrames = frame.frames || [];
+    return childFrames.reduce(
+        (frames: any[], childFrame: any) => frames.concat(getAllFrames(childFrame)),
+        [frame],
+    );
+}
+
+async function selectAllNetworkFrameSessions(targetWindow: BrowserWindow) {
+    const frames = getAllFrames(targetWindow.webContents.mainFrame).filter(
+        (frame) => frame !== targetWindow.webContents.mainFrame,
+    );
+    const results = await Promise.all(
+        frames.map((frame) =>
+            frame.executeJavaScript(SELECT_ALL_NETWORK_SESSIONS_FRAME_SCRIPT, true).catch(() => false),
+        ),
+    );
+    if (results.indexOf('typing') !== -1) {
+        return 'typing';
+    }
+    return results.indexOf('selected') !== -1;
+}
+
+function selectAllNetworkSessions(window?: BrowserWindow | null) {
+    const targetWindow = window || mainWindow;
+    if (!targetWindow || targetWindow.isDestroyed()) {
+        return;
+    }
+    Promise.all([
+        targetWindow.webContents.executeJavaScript(SELECT_ALL_NETWORK_SESSIONS_SCRIPT, true).catch(() => false),
+        selectAllNetworkFrameSessions(targetWindow).catch(() => false),
+    ]).then(([handledInWindow, handledInFrame]) => {
+        if (handledInFrame === 'typing' && !targetWindow.isDestroyed()) {
+            targetWindow.webContents.selectAll();
+            return;
+        }
+        if (!handledInWindow && !handledInFrame && !targetWindow.isDestroyed()) {
+            targetWindow.webContents.selectAll();
+        }
+    });
+}
+
+function registerSelectAllShortcut(window: BrowserWindow) {
+    globalShortcut.register('CommandOrControl+A', () => {
+        selectAllNetworkSessions(window);
+    });
+}
+
+function normalizeMenuLabel(label?: string) {
+    return (label || '').replace(/&/g, '').trim().toLowerCase();
+}
 
 app.commandLine.appendSwitch('--no-proxy-server');
 app.commandLine.appendSwitch('disable-site-isolation-trials');
@@ -306,16 +392,19 @@ function createMainWindow() {
         });
     });
 
-    window.webContents.on('before-input-event', (_event, input) => {
+    window.webContents.on('before-input-event', (event, input) => {
         const key = input.key && input.key.toLowerCase();
         if ((input.meta || input.control) && !input.alt && !input.shift && key === 'a') {
-            window.webContents.executeJavaScript(SELECT_ALL_NETWORK_SESSIONS_SCRIPT, true).catch(() => undefined);
+            event.preventDefault();
+            selectAllNetworkSessions(window);
         }
     });
 
     const REFRESH_KEYS = ['CommandOrControl+R', 'CommandOrControl+Shift+R', 'F5'];
+    registerSelectAllShortcut(window);
 
     window.on('focus', () => {
+        registerSelectAllShortcut(window);
         REFRESH_KEYS.forEach((key) => {
             globalShortcut.register(key, () => {
                 // pass
@@ -324,6 +413,7 @@ function createMainWindow() {
     });
 
     window.on('blur', () => {
+        globalShortcut.unregister('CommandOrControl+A');
         REFRESH_KEYS.forEach((key) => {
             globalShortcut.unregister(key);
         });
@@ -342,12 +432,46 @@ function setApplicationMenu() {
             return menu.role !== 'help';
         })
         .forEach((menu) => {
-            // @ts-ignore
-            if (menu.role === 'viewmenu') {
+            const menuRole = (menu as any).role;
+            const menuLabel = normalizeMenuLabel(menu.label);
+            if (menuRole === 'editmenu' || menuRole === 'editMenu' || menuLabel === 'edit') {
                 const subMenu = new Menu();
                 (menu.submenu?.items ?? []).forEach((item) => {
-                    // @ts-ignore
-                    if (item.role !== 'reload' && item.role !== 'forcereload') {
+                    const itemRole = (item as any).role;
+                    const itemLabel = normalizeMenuLabel(item.label);
+                    if (itemRole === 'selectall' || itemRole === 'selectAll' || itemLabel === 'select all') {
+                        subMenu.append(
+                            new MenuItem({
+                                label: item.label || 'Select All',
+                                accelerator: item.accelerator || 'CommandOrControl+A',
+                                click: (_item, focusedWindow) => {
+                                    selectAllNetworkSessions(focusedWindow);
+                                },
+                            }),
+                        );
+                    } else {
+                        subMenu.append(item);
+                    }
+                });
+                applicationMenu.append(
+                    new MenuItem({
+                        type: menu.type,
+                        label: menu.label,
+                        submenu: subMenu,
+                    }),
+                );
+            } else if (menuRole === 'viewmenu' || menuRole === 'viewMenu' || menuLabel === 'view') {
+                const subMenu = new Menu();
+                (menu.submenu?.items ?? []).forEach((item) => {
+                    const itemRole = (item as any).role;
+                    const itemLabel = normalizeMenuLabel(item.label);
+                    if (
+                        itemRole !== 'reload' &&
+                        itemRole !== 'forcereload' &&
+                        itemRole !== 'forceReload' &&
+                        itemLabel !== 'reload' &&
+                        itemLabel !== 'force reload'
+                    ) {
                         subMenu.append(item);
                     }
                 });
