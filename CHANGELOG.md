@@ -1,5 +1,6 @@
 # 2026-04-26
 
+- 修复 Network 面板 Command+A 在列表未获得焦点时无法选择当前可见请求的问题 @leereliu
 - 增加 Network 面板 Command+A 和 Ctrl+A 选择当前可见请求，便于导出 HAR @leereliu
 - 修复 macOS 证书安装完成标记复用导致新 root.crt 未被系统信任的问题 @leereliu
 - 修复 macOS 证书安装弹框循环出现导致应用卡住的问题 @leereliu

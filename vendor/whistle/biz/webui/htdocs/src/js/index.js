@@ -1362,6 +1362,15 @@ var Index = React.createClass({
         }
         e.keyCode == 68 && removeItem(e);
         var modal = self.state.network;
+        if (isNetwork && e.keyCode === 65) {
+          var target = e.target;
+          var nodeName = target && target.nodeName;
+          if (nodeName !== 'INPUT' && nodeName !== 'TEXTAREA' && !(target && target.isContentEditable)) {
+            e.preventDefault();
+            events.trigger('selectAllNetworkSessions');
+            return;
+          }
+        }
         if (isNetwork && e.keyCode === 83) {
           e.preventDefault();
           if ($('.modal.in').length) {

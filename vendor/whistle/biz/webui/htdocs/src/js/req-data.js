@@ -195,6 +195,11 @@ function isVisibleInTree(item) {
   return !parent || (parent.expand && parent.pExpand);
 }
 
+function isTypingTarget(target) {
+  var tagName = target && target.tagName;
+  return !!target && (tagName === 'INPUT' || tagName === 'TEXTAREA' || target.isContentEditable);
+}
+
 function hasRules(rules) {
   var keys = Object.keys(rules);
   if (keys && keys.length) {
@@ -603,6 +608,9 @@ var ReqData = React.createClass({
     events.on('focusNetworkList', function () {
       self.container.focus();
     });
+    events.on('selectAllNetworkSessions', function () {
+      self.selectAllVisible();
+    });
     var curRemoteUrl;
     var importRemoteUrl = function () {
       var hash = location.hash.substring(1);
@@ -694,6 +702,7 @@ var ReqData = React.createClass({
     modal.clearActive();
     item.active = item.selected;
     hm && self.scrollToRow(item);
+    self.container && self.container.focus();
     events.trigger('networkStateChange');
     events.trigger('selectedSessionChange', item);
   },
@@ -1216,23 +1225,25 @@ var ReqData = React.createClass({
     if (!e.metaKey && !e.ctrlKey) {
       return;
     }
-    var tagName = e.target && e.target.tagName;
-    if (tagName === 'INPUT' || tagName === 'TEXTAREA' || e.target.isContentEditable) {
+    if (isTypingTarget(e.target)) {
       return;
     }
     if (e.keyCode === 82) {
       events.trigger('replaySessions', [null, e.shiftKey]);
     } else if (e.keyCode === 65) {
       e.preventDefault();
-      var selectedItem = this.props.modal.selectAllVisible();
-      if (selectedItem) {
-        this.updateList();
-        events.trigger('networkStateChange');
-        events.trigger('selectedSessionChange', selectedItem);
-      }
+      this.selectAllVisible();
     } else if (e.keyCode === 69) {
       e.preventDefault();
       events.trigger('composer');
+    }
+  },
+  selectAllVisible: function () {
+    var selectedItem = this.props.modal.selectAllVisible();
+    if (selectedItem) {
+      this.updateList();
+      events.trigger('networkStateChange');
+      events.trigger('selectedSessionChange', selectedItem);
     }
   },
   renderColumn: function (col) {
