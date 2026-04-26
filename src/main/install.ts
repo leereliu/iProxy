@@ -33,6 +33,33 @@ const sudoOptions = {
     name: 'iProxy',
 };
 
+const LEGACY_INSTALL_DONE_FILE = '/tmp/iproxy-install-done';
+
+function shellQuote(value: string) {
+    return "'" + value.replace(/'/g, "'\\''") + "'";
+}
+
+function isCurrentMacOSCertTrusted(certPath: string) {
+    if (!SYSTEM_IS_MACOS) {
+        return true;
+    }
+
+    try {
+        execSync(
+            `security verify-cert -c ${shellQuote(certPath)} -p ssl -k /Library/Keychains/System.keychain`,
+            {
+                // @ts-ignore
+                windowsHide: true,
+                stdio: 'ignore',
+            },
+        );
+        return true;
+    } catch (e) {
+        logger.warn('Current root certificate is not trusted by macOS System keychain', e);
+        return false;
+    }
+}
+
 async function generateCert() {
     return new Promise((resolve) => {
         const keys = pki.rsa.generateKeyPair(2048);
@@ -131,22 +158,25 @@ export async function installCertAndHelper() {
     await fs.writeFileAsync(path.join(dir, CERT_KEY_FILE_NAME), certs.key, 'utf-8');
     await fs.writeFileAsync(path.join(dir, CERT_FILE_NAME), certs.cert, 'utf-8');
 
-    const formatPath = (path: string) => '"' + path + '"';
+    const installDoneFile = path.join(dir, `iproxy-install-${process.pid}-${Date.now()}.done`);
+    await fs.removeAsync(installDoneFile);
+    await fs.removeAsync(LEGACY_INSTALL_DONE_FILE);
 
-    const INSTALL_DONE_FILE = '/tmp/iproxy-install-done';
     // 信任证书 & 安装 helper
     const installPromise = new Promise((resolve, reject) => {
         if (SYSTEM_IS_MACOS) {
             // macOS big sur do not allow trust cert in any auto way
             // show box to guide user run command
-            const cmd = `echo "Please input local login password 请输入本地登录密码" && sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "${path.join(
-                    dir,
-                    CERT_FILE_NAME,
-                )}" && sudo cp ${formatPath(PROXY_CONF_HELPER_FILE_PATH)} ${formatPath(
+            const certPath = path.join(dir, CERT_FILE_NAME);
+            const cmd = `echo "Please input local login password 请输入本地登录密码" && rm -f ${shellQuote(
+                    installDoneFile,
+                )} && sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ${shellQuote(
+                    certPath,
+                )} && sudo cp ${shellQuote(PROXY_CONF_HELPER_FILE_PATH)} ${shellQuote(
                     PROXY_CONF_HELPER_PATH,
-                )} && sudo chown root:admin ${formatPath(PROXY_CONF_HELPER_PATH)} && sudo chmod a+rx+s ${formatPath(
+                )} && sudo chown root:admin ${shellQuote(PROXY_CONF_HELPER_PATH)} && sudo chmod a+rx+s ${shellQuote(
                     PROXY_CONF_HELPER_PATH,
-                )} && touch ${INSTALL_DONE_FILE} && echo "安装完成"
+                )} && touch ${shellQuote(installDoneFile)} && echo "安装完成"
                 `;
             clipboard.writeText(cmd);
 
@@ -169,13 +199,13 @@ export async function installCertAndHelper() {
                     return;
                 }
 
-                if (fs.existsSync(INSTALL_DONE_FILE)) {
+                if (fs.existsSync(installDoneFile) && isCurrentMacOSCertTrusted(certPath)) {
                     installed = true;
                 } else {
                     clipboard.writeText(cmd);
                     dialog.showMessageBoxSync({
                         type: 'warning',
-                        message: `Installation not detected. Please run the command in Terminal and click OK when done.\n未检测到安装完成，请在终端执行命令后再点击确认。\n\n命令已重新复制到剪贴板。`,
+                        message: `Installation not detected or certificate is not trusted. Please run the command in Terminal and click OK when done.\n未检测到安装完成，或当前证书尚未被系统信任。请在终端执行命令后再点击确认。\n\n命令已重新复制到剪贴板。`,
                     });
                 }
                 retries++;
@@ -195,7 +225,7 @@ export async function installCertAndHelper() {
                 const command = `certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n iProxy -i "${path.join(
                     dir,
                     CERT_FILE_NAME,
-                )}" && touch ${INSTALL_DONE_FILE} && echo "安装完成"`;
+                )}" && touch ${shellQuote(installDoneFile)} && echo "安装完成"`;
                 console.log('run command', command);
                 try {
                     const output = execSync(command, {
@@ -249,13 +279,16 @@ export async function installCertAndHelper() {
     }
     console.log('after install');
     // 信任完成，把证书目录拷贝过去
+    await fs.removeAsync(installDoneFile);
     await fs.copyAsync(dir, IPROXY_CERT_DIR_PATH);
     console.log('copy cert done');
 }
 
 async function checkCertInstall() {
+    const certPath = path.join(IPROXY_CERT_DIR_PATH, CERT_FILE_NAME);
     const certKeyExist = await fs.existsAsync(IPROXY_CERT_KEY_PATH);
-    if (!certKeyExist) {
+    const certExist = await fs.existsAsync(certPath);
+    if (!certKeyExist || !certExist) {
         return false;
     }
     const { ctimeMs } = await fs.statAsync(IPROXY_CERT_KEY_PATH);
@@ -263,9 +296,9 @@ async function checkCertInstall() {
     // expire at 11 month(cert expire in 1 year in fact)
     const expireTime = ctimeMs + 11 * 30 * 24 * 60 * 60 * 1000;
     const currentTime = Date.now();
-    logger.info({ ctimeMs, certKeyExist, expireTime, currentTime });
+    logger.info({ ctimeMs, certKeyExist, certExist, expireTime, currentTime });
 
-    return currentTime < expireTime;
+    return currentTime < expireTime && isCurrentMacOSCertTrusted(certPath);
 }
 
 async function checkHelperInstall() {
