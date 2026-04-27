@@ -89,13 +89,4 @@ The SSL variables above are only needed on local networks that intercept TLS tra
 For new contributors you can try to fix a [🏅send-a-PR](https://github.com/leereliu/iproxy/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%8F%85send+a+PR%22)
 
 ## Contributors ✨
-<p align="center">
-  <a href="https://github.com/leereliu"><img src="https://avatars.githubusercontent.com/u/25074202?s=80&v=4" width="60" height="60" alt="leereliu" /></a>
-  <a href="https://github.com/xcodebuild"><img src="https://avatars.githubusercontent.com/u/5436704?s=80&v=4" width="60" height="60" alt="xcodebuild" /></a>
-  <a href="https://github.com/shejinxin"><img src="https://avatars.githubusercontent.com/u/139830914?s=80&v=4" width="60" height="60" alt="shejinxin" /></a>
-  <a href="https://github.com/ahonn"><img src="https://avatars.githubusercontent.com/u/9718515?s=80&v=4" width="60" height="60" alt="ahonn" /></a>
-  <a href="https://github.com/njzydark"><img src="https://avatars.githubusercontent.com/u/19601720?s=80&v=4" width="60" height="60" alt="njzydark" /></a>
-  <a href="https://github.com/richardo2016"><img src="https://avatars.githubusercontent.com/u/6339390?s=80&v=4" width="60" height="60" alt="richardo2016" /></a>
-  <a href="https://github.com/Runly"><img src="https://avatars.githubusercontent.com/u/18432577?s=80&v=4" width="60" height="60" alt="Runly" /></a>
-  <a href="https://github.com/shouhuanxiaoji"><img src="https://avatars.githubusercontent.com/u/4121607?s=80&v=4" width="60" height="60" alt="shouhuanxiaoji" /></a>
-</p>
+<p align="center"><a href="https://github.com/leereliu"><img src="https://avatars.githubusercontent.com/u/25074202?s=80&v=4" width="60" height="60" alt="leereliu" /></a>&nbsp;&nbsp;<a href="https://github.com/xcodebuild"><img src="https://avatars.githubusercontent.com/u/5436704?s=80&v=4" width="60" height="60" alt="xcodebuild" /></a>&nbsp;&nbsp;<a href="https://github.com/shejinxin"><img src="https://avatars.githubusercontent.com/u/139830914?s=80&v=4" width="60" height="60" alt="shejinxin" /></a>&nbsp;&nbsp;<a href="https://github.com/ahonn"><img src="https://avatars.githubusercontent.com/u/9718515?s=80&v=4" width="60" height="60" alt="ahonn" /></a>&nbsp;&nbsp;<a href="https://github.com/njzydark"><img src="https://avatars.githubusercontent.com/u/19601720?s=80&v=4" width="60" height="60" alt="njzydark" /></a>&nbsp;&nbsp;<a href="https://github.com/richardo2016"><img src="https://avatars.githubusercontent.com/u/6339390?s=80&v=4" width="60" height="60" alt="richardo2016" /></a>&nbsp;&nbsp;<a href="https://github.com/Runly"><img src="https://avatars.githubusercontent.com/u/18432577?s=80&v=4" width="60" height="60" alt="Runly" /></a>&nbsp;&nbsp;<a href="https://github.com/shouhuanxiaoji"><img src="https://avatars.githubusercontent.com/u/4121607?s=80&v=4" width="60" height="60" alt="shouhuanxiaoji" /></a></p>
