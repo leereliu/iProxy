@@ -1,8 +1,4 @@
-[![CI](https://github.com/leereliu/iProxy/actions/workflows/ci.yml/badge.svg)](https://github.com/leereliu/iProxy/actions/workflows/ci.yml)
 [![Release](https://github.com/leereliu/iProxy/actions/workflows/release.yml/badge.svg)](https://github.com/leereliu/iProxy/actions/workflows/release.yml)
-![GitHub issues](https://img.shields.io/github/issues/leereliu/iproxy)
-![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/leereliu/iproxy)
-[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fleereliu%2Fiproxy&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 <p align="center">
    <a href="https://www.yuque.com/iproxy">
@@ -92,19 +88,14 @@ The SSL variables above are only needed on local networks that intercept TLS tra
 
 For new contributors you can try to fix a [🏅send-a-PR](https://github.com/leereliu/iproxy/issues?q=is%3Aissue+is%3Aopen+label%3A%22%F0%9F%8F%85send+a+PR%22)
 
-## 入群讨论
-
-| 钉钉群 | 微信群 |
-| ------------- | ------------- |
-|![image](https://user-images.githubusercontent.com/5436704/125047063-2b0d2300-e0d1-11eb-9451-e3b50a81123c.png)| ![image](https://user-images.githubusercontent.com/5436704/140032152-52ecba45-32eb-4ba1-85eb-62392a0869e9.png)|
-
 ## Contributors ✨
 <p align="center">
-  <a href="https://github.com/leereliu/iproxy/graphs/contributors">
-    <img src="https://contributors-img.web.app/image?repo=leereliu/iproxy"></img>
-  </a>
+  <a href="https://github.com/leereliu"><img src="https://avatars.githubusercontent.com/u/25074202?s=80&v=4" width="60" height="60" alt="leereliu" /></a>
+  <a href="https://github.com/xcodebuild"><img src="https://avatars.githubusercontent.com/u/5436704?s=80&v=4" width="60" height="60" alt="xcodebuild" /></a>
+  <a href="https://github.com/shejinxin"><img src="https://avatars.githubusercontent.com/u/139830914?s=80&v=4" width="60" height="60" alt="shejinxin" /></a>
+  <a href="https://github.com/ahonn"><img src="https://avatars.githubusercontent.com/u/9718515?s=80&v=4" width="60" height="60" alt="ahonn" /></a>
+  <a href="https://github.com/njzydark"><img src="https://avatars.githubusercontent.com/u/19601720?s=80&v=4" width="60" height="60" alt="njzydark" /></a>
+  <a href="https://github.com/richardo2016"><img src="https://avatars.githubusercontent.com/u/6339390?s=80&v=4" width="60" height="60" alt="richardo2016" /></a>
+  <a href="https://github.com/Runly"><img src="https://avatars.githubusercontent.com/u/18432577?s=80&v=4" width="60" height="60" alt="Runly" /></a>
+  <a href="https://github.com/shouhuanxiaoji"><img src="https://avatars.githubusercontent.com/u/4121607?s=80&v=4" width="60" height="60" alt="shouhuanxiaoji" /></a>
 </p>
-
-## Commit History
-
-[![Commit History Chart](https://commit-history-api.herokuapp.com/svg?repos=leereliu/iProxy&type=Date)](https://the-commit-history.vercel.app/#leereliu/iProxy&Date)
